@@ -1,34 +1,45 @@
 import React, { Component } from "react";
-import { useEffect } from "react";
+
+const SECURITY_CODE = "paradigma";
 
 export class ClassState extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      value: "",
       error: false,
       loading: false,
     };
   }
 
   componentDidUpdate(prevProps) {
-    console.log("Empezando el efecto...");
-    if (!!this.state.loading)
+    const { value, loading } = this.state;
+
+    if (!!loading)
       setTimeout(() => {
-        console.log("haciendo el efecto...");
-        this.setState((prev) => ({ loading: false }));
-      }, 5000);
-    console.log("terminando el efecto...");
+        if (value !== SECURITY_CODE) {
+          this.setState({ loading: false, error: true });
+        } else {
+          this.setState({ loading: false, error: false });
+        }
+      }, 2000);
   }
 
   render() {
     const { name } = this.props;
+    const { value, error, loading } = this.state;
     return (
       <div>
         <h2>Eliminar {name}</h2>
         <p>Por favor, escribe el codigo de seguridad.</p>
-        {this.state.error && <p>"Error: esto no funciona"</p>}
-        {this.state.loading && <p>"Cargando..."</p>}
-        <input placeholder="Codigo de seguridad" type="text" />
+        {error && !loading && <p>"Error: esto no funciona"</p>}
+        {loading && <p>"Cargando..."</p>}
+        <input
+          value={value}
+          onChange={(event) => this.setState({ value: event.target.value })}
+          placeholder="Codigo de seguridad"
+          type="text"
+        />
         <button onClick={() => this.setState((prev) => ({ loading: true }))}>
           Comprobar
         </button>

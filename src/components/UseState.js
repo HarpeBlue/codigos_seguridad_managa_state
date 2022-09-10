@@ -11,15 +11,49 @@ export const UseState = ({ name }) => {
     confirmed: false,
   });
 
+  const onChange = (event) => {
+    setState((prev) => ({ ...prev, value: event.target.value }));
+  };
+
+  const onConfirm = () => {
+    setState((prev) => ({
+      ...prev,
+      error: false,
+      confirmed: true,
+      loading: false,
+    }));
+  };
+
+  const onError = () => {
+    setState((prev) => ({ ...prev, error: true, loading: false }));
+  };
+
+  const onCheck = () => {
+    setState((prev) => ({ ...prev, loading: true }));
+  };
+
+  const onDeleted = () => {
+    setState((prev) => ({ ...prev, deleted: true }));
+  };
+
+  const onReset = () => {
+    setState((prev) => ({
+      error: false,
+      loading: false,
+      value: "",
+      deleted: false,
+      confirmed: false,
+    }));
+  };
+
   useEffect(() => {
     if (!!state.loading)
       setTimeout(() => {
         if (state.value !== SECURITY_CODE) {
-          setState((prev) => ({ ...prev, error: true }));
+          onError();
         } else {
-          setState((prev) => ({ ...prev, error: false, confirmed: true }));
+          onConfirm();
         }
-        setState((prev) => ({ ...prev, loading: false }));
       }, 5000);
   }, [state.loading]);
 
@@ -35,53 +69,26 @@ export const UseState = ({ name }) => {
 
         <input
           value={state.value}
-          onChange={(event) =>
-            setState((prev) => ({ ...prev, value: event.target.value }))
-          }
+          onChange={onChange}
           placeholder="Codigo de seguridad"
           type="text"
         />
-        <button
-          onClick={() => setState((prev) => ({ ...prev, loading: true }))}
-        >
-          Comprobar
-        </button>
+        <button onClick={onCheck}>Comprobar</button>
       </div>
     );
   } else if (!!state.confirmed && !state.deleted) {
     return (
       <>
         <p>Pedimos confirmacion, estas seguro?</p>
-        <button
-          onClick={() => setState((prev) => ({ ...prev, deleted: true }))}
-        >
-          Si, eliminar
-        </button>
-        <button
-          onClick={() =>
-            setState((prev) => ({ ...prev, confirmed: false, value: "" }))
-          }
-        >
-          No, me arrepenti.
-        </button>
+        <button onClick={onDeleted}>Si, eliminar</button>
+        <button onClick={onReset}>No, me arrepenti.</button>
       </>
     );
   } else {
     return (
       <>
         <p>Eliminado con exito</p>
-        <button
-          onClick={() =>
-            setState((prev) => ({
-              ...prev,
-              confirmed: false,
-              deleted: false,
-              value: "",
-            }))
-          }
-        >
-          Resetear, volver atras
-        </button>
+        <button onClick={onReset}>Resetear, volver atras</button>
       </>
     );
   }

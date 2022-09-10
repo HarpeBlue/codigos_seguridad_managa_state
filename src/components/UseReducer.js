@@ -10,30 +10,39 @@ const initialState = {
   confirmed: false,
 };
 
+const actionTypes = {
+  CONFIRM: "CONFIRM",
+  ERROR: "ERROR",
+  CHECK: "CHECK",
+  CHANGE: "CHANGE",
+  RESET: "RESET",
+  DELETED: "DELETED",
+};
+
 const reducerObject = (state, payload) => ({
-  ERROR: {
+  [actionTypes.ERROR]: {
     ...state,
     error: true,
     loading: false,
   },
-  CHECK: {
+  [actionTypes.CHECK]: {
     ...state,
     loading: true,
   },
-  CHANGE: {
+  [actionTypes.CHANGE]: {
     ...state,
     value: payload,
   },
-  RESET: {
+  [actionTypes.RESET]: {
     ...initialState,
   },
-  CONFIRM: {
+  [actionTypes.CONFIRM]: {
     ...state,
     error: false,
     confirmed: true,
     loading: false,
   },
-  DELETED: {
+  [actionTypes.DELETED]: {
     ...state,
     deleted: true,
   },
@@ -51,26 +60,31 @@ export const UseReducer = ({ name }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const onChange = (event) => {
-    dispatch({ type: "CHANGE", payload: event.target.value });
+    dispatch({ type: actionTypes.CHANGE, payload: event.target.value });
   };
   const onCheck = () => {
-    dispatch({ type: "CHECK" });
+    dispatch({ type: actionTypes.CHECK });
   };
   const onDeleted = () => {
-    dispatch({ type: "DELETED" });
+    dispatch({ type: actionTypes.DELETED });
   };
   const onReset = () => {
-    dispatch({ type: "RESET" });
+    dispatch({ type: actionTypes.RESET });
   };
-  console.log({ state });
+  const onConfirm = () => {
+    dispatch({ type: actionTypes.CONFIRM });
+  };
+  const onError = () => {
+    dispatch({ type: actionTypes.ERROR });
+  };
 
   useEffect(() => {
     if (!!state.loading)
       setTimeout(() => {
         if (state.value !== SECURITY_CODE) {
-          dispatch({ type: "ERROR" });
+          onError();
         } else {
-          dispatch({ type: "CONFIRM" });
+          onConfirm();
         }
       }, 5000);
   }, [state.loading]);
